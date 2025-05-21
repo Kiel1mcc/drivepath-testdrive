@@ -1,4 +1,3 @@
-// Entry point: Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { getDatabase, ref, onValue, update } from 'firebase/database';
 import app from './firebase';
@@ -42,48 +41,44 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">🚘 Live Test Drive Requests</h1>
-      <table className="w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">Time</th>
-            <th className="border p-2">VIN</th>
-            <th className="border p-2">Stock #</th>
-            <th className="border p-2">Status</th>
-            <th className="border p-2">Action</th>
-            <th className="border p-2">Duration</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requests.map(req => (
-            <tr key={req.id} className="border-t">
-              <td className="border p-2">{req.timestamp}</td>
-              <td className="border p-2 font-mono">{req.vin}</td>
-              <td className="border p-2">{req.stock}</td>
-              <td className="border p-2">
-                {req.status === 'complete' ? '✅ Complete' : req.status === 'in-progress' ? '🟠 In Progress' : '🟡 Waiting'}
-              </td>
-              <td className="border p-2">
-                {req.status === 'in-progress' ? (
-                  <button className="text-green-600 font-semibold" onClick={() => handleComplete(req.id, req.startTime)}>Complete</button>
-                ) : req.status === 'complete' ? (
-                  '—'
-                ) : (
-                  <button className="text-blue-600 font-semibold" onClick={() => handleClaim(req.id)}>Claim</button>
-                )}
-              </td>
-              <td className="border p-2">{req.duration || '—'}</td>
+    <div className="p-4 md:p-6 max-w-full mx-auto">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">🚘 Live Test Drive Requests</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border text-xs md:text-sm">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">Time</th>
+              <th className="border p-2">VIN</th>
+              <th className="border p-2">Stock #</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Action</th>
+              <th className="border p-2">Duration</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {requests.map(req => (
+              <tr key={req.id} className="border-t">
+                <td className="border p-2 whitespace-nowrap">{req.timestamp}</td>
+                <td className="border p-2 font-mono break-all">{req.vin}</td>
+                <td className="border p-2">{req.stock}</td>
+                <td className="border p-2">
+                  {req.status === 'complete' ? '✅ Complete' : req.status === 'in-progress' ? '🟠 In Progress' : '🟡 Waiting'}
+                </td>
+                <td className="border p-2">
+                  {req.status === 'in-progress' ? (
+                    <button className="text-green-600 font-semibold" onClick={() => handleComplete(req.id, req.startTime)}>Complete</button>
+                  ) : req.status === 'complete' ? (
+                    '—'
+                  ) : (
+                    <button className="text-blue-600 font-semibold" onClick={() => handleClaim(req.id)}>Claim</button>
+                  )}
+                </td>
+                <td className="border p-2">{req.duration || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
-
-// Firebase config in firebase.js
-// import { initializeApp } from 'firebase/app';
-// const firebaseConfig = { ... }; // from Firebase console
-// const app = initializeApp(firebaseConfig);
-// export default app;
