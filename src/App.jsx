@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useEffect, useState } from 'react';
 import { getDatabase, ref, push } from 'firebase/database';
 import app from './firebase';
@@ -20,10 +19,27 @@ export default function App() {
     const db = getDatabase(app);
     const reqRef = ref(db, 'testDriveRequests');
 
+    // 1. Push to Firebase
     push(reqRef, {
       vin,
       stock,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date().toLocaleTimeString()
+    });
+
+    // 2. Send Pushover Notification
+    fetch("https://api.pushover.net/1/messages.json", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        token: "aupjkhweyqjosrxkqmuoh2gtqgnjjq",
+        user: "u8rd182cirsqwn5bzktt8fpgpenwx2",
+        title: "🚗 New Test Drive Request",
+        message: `VIN: ${vin}\nStock: ${stock}`,
+        url: "https://drivepath-testdrive.netlify.app/dashboard",
+        url_title: "Open Dashboard"
+      })
     });
 
     setTimeout(() => {
