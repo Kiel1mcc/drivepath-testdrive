@@ -45,10 +45,10 @@ export default function Dashboard() {
   const isNewCar = (req) => req.type === 'new-delivery';
 
   return (
-    <div className="p-4 md:p-6 max-w-full mx-auto">
+    <div className="p-2 md:p-6 w-full">
       <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">🚘 Live Test Drive Requests</h1>
       <div className="overflow-x-auto">
-        <table className="min-w-full border text-xs md:text-sm">
+        <table className="min-w-[950px] w-full border text-xs md:text-sm">
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">Time</th>
