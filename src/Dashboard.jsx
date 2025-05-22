@@ -71,7 +71,7 @@ export default function Dashboard() {
           <tbody>
             {requests.map(req => (
               <tr key={req.id} className={`border-t ${isNewCar(req) ? 'bg-yellow-100' : ''}`}>
-                <td className="border p-2 whitespace-nowrap">{req.timestamp}</td>
+                <td className="border p-2 whitespace-nowrap">{req.timestamp ? new Date(req.timestamp).toLocaleTimeString() : '—'}</td>
                 <td className="border p-2 font-mono break-all">{req.vin}</td>
                 <td className="border p-2">{req.stock}</td>
                 <td className="border p-2">{req.year || '—'}</td>
