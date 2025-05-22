@@ -23,7 +23,7 @@ export default function App() {
     push(reqRef, {
       vin,
       stock,
-      timestamp: new Date().toLocaleTimeString()
+     timestamp: Date.now()
     });
 
     // 2. Send Pushover Notification
