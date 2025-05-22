@@ -30,16 +30,21 @@ export default function Dashboard() {
   };
 
   const handleComplete = (id, requestTime) => {
-    const endTime = Date.now();
-    const startTime = new Date(requestTime).getTime();
-    const durationMs = endTime - startTime;
-    const minutes = Math.floor(durationMs / 60000);
-    const seconds = Math.floor((durationMs % 60000) / 1000);
-    const duration = `${minutes}m ${seconds}s`;
+    try {
+      const endTime = Date.now();
+      const startTime = new Date(`1970-01-01T${requestTime}`).getTime();
+      if (isNaN(startTime)) throw new Error("Invalid start time");
+      const durationMs = endTime - startTime;
+      const minutes = Math.floor(durationMs / 60000);
+      const seconds = Math.floor((durationMs % 60000) / 1000);
+      const duration = `${minutes}m ${seconds}s`;
 
-    const db = getDatabase(app);
-    const reqRef = ref(db, `testDriveRequests/${id}`);
-    update(reqRef, { status: 'complete', completedAt: new Date().toLocaleTimeString(), duration });
+      const db = getDatabase(app);
+      const reqRef = ref(db, `testDriveRequests/${id}`);
+      update(reqRef, { status: 'complete', completedAt: new Date().toLocaleTimeString(), duration });
+    } catch (error) {
+      console.error('Failed to calculate duration:', error);
+    }
   };
 
   const isNewCar = (req) => req.type === 'new-delivery';
