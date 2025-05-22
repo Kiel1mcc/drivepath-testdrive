@@ -32,7 +32,7 @@ export default function Dashboard() {
   const handleComplete = (id, requestTime) => {
     try {
       const endTime = Date.now();
-      const startTime = new Date(`1970-01-01T${requestTime}`).getTime();
+      const startTime = Number(requestTime);
       if (isNaN(startTime)) throw new Error("Invalid start time");
       const durationMs = endTime - startTime;
       const minutes = Math.floor(durationMs / 60000);
