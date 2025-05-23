@@ -5,6 +5,7 @@ import app from './firebase';
 
 export default function Dashboard() {
   const [requests, setRequests] = useState([]);
+  const [plateInputs, setPlateInputs] = useState({});
 
   useEffect(() => {
     const db = getDatabase(app);
@@ -24,11 +25,8 @@ export default function Dashboard() {
   }, []);
 
   const handleClaim = (id) => {
-    const db = getDatabase(app);
-    const reqRef = ref(db, `testDriveRequests/${id}`);
     const reqRef = ref(getDatabase(app), `testDriveRequests/${id}`);
     update(reqRef, { status: 'in-progress', revealed: true });
-
   };
 
   const handleComplete = (id, requestTime) => {
@@ -41,9 +39,13 @@ export default function Dashboard() {
       const seconds = Math.floor((durationMs % 60000) / 1000);
       const duration = `${minutes}m ${seconds}s`;
 
-      const db = getDatabase(app);
-      const reqRef = ref(db, `testDriveRequests/${id}`);
-      update(reqRef, { status: 'complete', completedAt: new Date().toLocaleTimeString(), duration });
+      const reqRef = ref(getDatabase(app), `testDriveRequests/${id}`);
+      update(reqRef, {
+        status: 'complete',
+        completedAt: new Date().toLocaleTimeString(),
+        duration,
+        plate: plateInputs[id] || ''
+      });
     } catch (error) {
       console.error('Failed to calculate duration:', error);
     }
@@ -53,38 +55,39 @@ export default function Dashboard() {
 
   return (
     <div className="p-2 md:p-6 w-full">
-      <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">🚘 Live Test Drive Requests</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">🚘 Guest Assistance Dashboard</h1>
       <div className="overflow-x-auto">
         <table className="min-w-[950px] w-full border text-xs md:text-sm">
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">Time</th>
-              <th className="border p-2">VIN</th>
-              <th className="border p-2">Stock #</th>
-              <th className="border p-2">Year</th>
-              <th className="border p-2">Make</th>
-              <th className="border p-2">Model</th>
+              <th className="border p-2">Task</th>
               <th className="border p-2">Status</th>
               <th className="border p-2">Action</th>
               <th className="border p-2">Duration</th>
-              <th className="border p-2">Type</th>
+              <th className="border p-2">Details</th>
             </tr>
           </thead>
           <tbody>
             {requests.map(req => (
               <tr key={req.id} className={`border-t ${isNewCar(req) ? 'bg-yellow-100' : ''}`}>
                 <td className="border p-2 whitespace-nowrap">{req.timestamp ? new Date(req.timestamp).toLocaleTimeString() : '—'}</td>
-                <td className="border p-2 font-mono break-all">{req.vin}</td>
-                <td className="border p-2">{req.stock}</td>
-                <td className="border p-2">{req.year || '—'}</td>
-                <td className="border p-2">{req.make || '—'}</td>
-                <td className="border p-2">{req.model || '—'}</td>
+                <td className="border p-2 font-semibold">Guest Request</td>
                 <td className="border p-2">
                   {req.status === 'complete' ? '✅ Complete' : req.status === 'in-progress' ? '🟠 In Progress' : '🟡 Waiting'}
                 </td>
                 <td className="border p-2">
                   {req.status === 'in-progress' ? (
-                    <button className="text-green-600 font-semibold" onClick={() => handleComplete(req.id, req.timestamp)}>Complete</button>
+                    <div className="space-y-2">
+                      <input
+                        className="border rounded px-2 py-1 w-full"
+                        type="text"
+                        placeholder="Enter plate number"
+                        value={plateInputs[req.id] || ''}
+                        onChange={(e) => setPlateInputs({ ...plateInputs, [req.id]: e.target.value })}
+                      />
+                      <button className="bg-green-600 text-white px-4 py-1 rounded" onClick={() => handleComplete(req.id, req.timestamp)}>Complete</button>
+                    </div>
                   ) : req.status === 'complete' ? (
                     '—'
                   ) : (
@@ -92,7 +95,16 @@ export default function Dashboard() {
                   )}
                 </td>
                 <td className="border p-2">{req.duration || '—'}</td>
-                <td className="border p-2">{isNewCar(req) ? '🆕 New Car Delivery' : 'Test Drive'}</td>
+                <td className="border p-2">
+                  {req.revealed ? (
+                    <div className="text-left">
+                      <p><strong>Task:</strong> Test Drive</p>
+                      <p><strong>Vehicle:</strong> {req.year || ''} {req.make || ''} {req.model || ''}</p>
+                      <p><strong>VIN:</strong> {req.vin}</p>
+                      <p><strong>Stock:</strong> {req.stock}</p>
+                    </div>
+                  ) : '—'}
+                </td>
               </tr>
             ))}
           </tbody>
