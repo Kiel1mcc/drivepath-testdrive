@@ -9,6 +9,7 @@ export default function UploadPage() {
   const [idUploaded, setIdUploaded] = useState(false);
   const [selfieUploaded, setSelfieUploaded] = useState(false);
   const [insuranceUploaded, setInsuranceUploaded] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -48,8 +49,24 @@ export default function UploadPage() {
       revealed: false
     });
 
-    alert('✅ Submitted! A guest assistant will be with you shortly.');
+    setShowConfirmation(true);
   };
+
+  if (showConfirmation) {
+    return (
+      <div className="p-6 max-w-xl mx-auto text-left">
+        <h1 className="text-2xl font-bold mb-4 text-center">You're All Set!</h1>
+        <p className="mb-4 text-gray-700 text-center">A guest assistant is on the way with your keys.</p>
+
+        <div className="space-y-3 text-sm text-gray-800">
+          <p>• The guest assistant will let you know where to park the vehicle when you return.</p>
+          <p>• If you have any questions during your test drive, you can request assistance at any time.</p>
+          <p>• You can also request a quote — via email, text, phone call, or even in person.</p>
+          <p>• Everything is contactless — it's up to you how you'd like to interact.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-xl mx-auto text-left">
