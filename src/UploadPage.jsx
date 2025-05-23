@@ -75,10 +75,10 @@ Phone: ${phone}`,
   if (showConfirmation) {
     return (
       <div className="p-6 max-w-3xl mx-auto text-left">
-        <h1 className="text-2xl font-bold mb-4 text-center">Key Tips</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center">Key Tips</h1>
         <p className="mb-4 text-gray-700 text-center">A guest assistant is on the way with your keys.</p>
 
-        <div className="space-y-3 text-sm text-gray-800">
+        <div className="space-y-6 text-lg text-gray-800 leading-relaxed">
           <p>• The guest assistant will let you know where to park the vehicle when you return.</p>
           <p>• If you have any questions during your test drive, you can request assistance at any time.</p>
           <p>• You can also request a quote — via email, text, phone call, or even in person.</p>
