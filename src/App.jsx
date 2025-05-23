@@ -22,6 +22,9 @@ export default function App() {
     push(reqRef, {
       vin,
       stock,
+      year: '2024',
+      make: 'Hyundai',
+      model: 'IONIQ 5',
       timestamp: Date.now(),
       status: 'waiting',
       revealed: false
