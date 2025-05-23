@@ -58,19 +58,24 @@ export default function UploadPage() {
         token: "aupjkhweyqjosrxkqmuoh2gtqgnjjq",
         user: "u8rd182cirsqwn5bzktt8fpgpenwx2",
         title: "Test Drive Request",
-        message: `VIN: ${vin}\nStock: ${stock}\nPhone: ${phone}`,
+        message: `VIN: ${vin}
+Stock: ${stock}
+Phone: ${phone}`,
         url: "https://drivepath-testdrive.netlify.app/dashboard",
         url_title: "Open Dashboard"
       })
     });
 
     setShowConfirmation(true);
+  });
+
+    setShowConfirmation(true);
   };
 
   if (showConfirmation) {
     return (
-      <div className="p-6 max-w-xl mx-auto text-left">
-        <h1 className="text-2xl font-bold mb-4 text-center">You're All Set!</h1>
+      <div className="p-6 max-w-3xl mx-auto text-left">
+        <h1 className="text-2xl font-bold mb-4 text-center">Key Tips</h1>
         <p className="mb-4 text-gray-700 text-center">A guest assistant is on the way with your keys.</p>
 
         <div className="space-y-3 text-sm text-gray-800">
