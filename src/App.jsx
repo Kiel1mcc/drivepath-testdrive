@@ -7,6 +7,7 @@ export default function App() {
   const [stock, setStock] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [photoTaken, setPhotoTaken] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,6 +52,15 @@ export default function App() {
     }, 5000);
   };
 
+  const handleTakePhoto = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = () => setPhotoTaken(true);
+    input.click();
+  };
+
   return (
     <div className="p-6 text-center max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">🚗 DrivePath Test Drive Request</h1>
@@ -58,13 +68,29 @@ export default function App() {
       <p className="mb-4"><strong>Stock #:</strong> {stock}</p>
 
       {!submitted && (
-        <button onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2 rounded">
-          Request Test Drive
-        </button>
+        <>
+          <button onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2 rounded">
+            Request Test Drive
+          </button>
+        </>
       )}
 
       {submitting && <p className="text-blue-600 mt-4">⏳ Authorizing your test drive...</p>}
-      {submitted && <p className="text-green-600 font-semibold mt-4">✅ Request sent! A guest assistant will be with you shortly.</p>}
+
+      {submitted && !photoTaken && (
+        <div className="mt-4">
+          <button
+            onClick={handleTakePhoto}
+            className="bg-yellow-500 text-white px-6 py-2 rounded"
+          >
+            Take a Picture of VIN
+          </button>
+        </div>
+      )}
+
+      {submitted && photoTaken && (
+        <p className="text-green-600 font-semibold mt-4">✅ VIN photo received. You may now proceed.</p>
+      )}
     </div>
   );
 }
