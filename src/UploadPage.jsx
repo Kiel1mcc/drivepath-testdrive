@@ -49,6 +49,21 @@ export default function UploadPage() {
       revealed: false
     });
 
+    fetch("https://api.pushover.net/1/messages.json", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        token: "aupjkhweyqjosrxkqmuoh2gtqgnjjq",
+        user: "u8rd182cirsqwn5bzktt8fpgpenwx2",
+        title: "Test Drive Request",
+        message: `VIN: ${vin}\nStock: ${stock}\nPhone: ${phone}`,
+        url: "https://drivepath-testdrive.netlify.app/dashboard",
+        url_title: "Open Dashboard"
+      })
+    });
+
     setShowConfirmation(true);
   };
 
