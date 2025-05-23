@@ -26,7 +26,9 @@ export default function Dashboard() {
   const handleClaim = (id) => {
     const db = getDatabase(app);
     const reqRef = ref(db, `testDriveRequests/${id}`);
-    update(reqRef, { status: 'in-progress' });
+    const reqRef = ref(getDatabase(app), `testDriveRequests/${id}`);
+    update(reqRef, { status: 'in-progress', revealed: true });
+
   };
 
   const handleComplete = (id, requestTime) => {
