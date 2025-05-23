@@ -7,7 +7,9 @@ export default function App() {
   const [stock, setStock] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [photoTaken, setPhotoTaken] = useState(false);
+  const [idUploaded, setIdUploaded] = useState(false);
+  const [selfieUploaded, setSelfieUploaded] = useState(false);
+  const [insuranceUploaded, setInsuranceUploaded] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,12 +54,15 @@ export default function App() {
     }, 5000);
   };
 
-  const handleTakePhoto = () => {
+  const handleUpload = (type) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = () => setPhotoTaken(true);
+    input.onchange = () => {
+      if (type === 'id') setIdUploaded(true);
+      if (type === 'selfie') setSelfieUploaded(true);
+      if (type === 'insurance') setInsuranceUploaded(true);
+    };
     input.click();
   };
 
@@ -77,19 +82,41 @@ export default function App() {
 
       {submitting && <p className="text-blue-600 mt-4">⏳ Authorizing your test drive...</p>}
 
-      {submitted && !photoTaken && (
-        <div className="mt-4">
-          <button
-            onClick={handleTakePhoto}
-            className="bg-yellow-500 text-white px-6 py-2 rounded"
-          >
-            Take a Picture of VIN
-          </button>
-        </div>
-      )}
+      {submitted && (
+        <div className="text-left mt-6">
+          <p className="mb-4 text-sm text-gray-700">
+            Please upload the following items. If you don’t have a physical copy, you may upload a file or screenshot. By submitting, you acknowledge that your personal information is being shared with the dealership for verification purposes only.
+          </p>
 
-      {submitted && photoTaken && (
-        <p className="text-green-600 font-semibold mt-4">✅ VIN photo received. You may now proceed.</p>
+          <div className="space-y-4">
+            <div>
+              <button
+                onClick={() => handleUpload('id')}
+                className="bg-gray-200 px-4 py-2 rounded"
+              >
+                {idUploaded ? '✅ ID Uploaded' : 'Upload Driver’s License or State ID'}
+              </button>
+            </div>
+
+            <div>
+              <button
+                onClick={() => handleUpload('selfie')}
+                className="bg-gray-200 px-4 py-2 rounded"
+              >
+                {selfieUploaded ? '✅ Selfie Uploaded' : 'Upload Selfie'}
+              </button>
+            </div>
+
+            <div>
+              <button
+                onClick={() => handleUpload('insurance')}
+                className="bg-gray-200 px-4 py-2 rounded"
+              >
+                {insuranceUploaded ? '✅ Insurance Uploaded' : 'Upload Insurance Card'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
