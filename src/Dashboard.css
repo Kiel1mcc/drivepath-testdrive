@@ -42,3 +42,21 @@
   border-radius: 8px;
   width: 300px;
 }
+
+/* Table styling for dashboard layout */
+table.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+table.requests-table th,
+table.requests-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+table.requests-table th {
+  background: #f7f7f7;
+}
