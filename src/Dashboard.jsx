@@ -89,6 +89,7 @@ function Dashboard() {
             <th>Status</th>
             <th>Claim</th>
             <th>Duration</th>
+            <th>Request</th>
           </tr>
         </thead>
         <tbody>
@@ -140,6 +141,7 @@ function Dashboard() {
                 )}
               </td>
               <td>{duration || "—"}</td>
+              <td>Test Drive</td>
             </tr>
           ))}
         </tbody>
