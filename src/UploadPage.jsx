@@ -36,37 +36,49 @@ export default function UploadPage() {
 
   const allUploaded = idUploaded && selfieUploaded && insuranceUploaded && phone.trim() !== '';
 
-  const handleSubmit = () => {
-    const db = getDatabase(app);
-    const reqRef = ref(db, 'testDriveRequests');
+  const handleSubmit = async () => {
+    try {
+      const db = getDatabase(app);
+      const reqRef = ref(db, 'testDriveRequests');
 
-    push(reqRef, {
-      vin,
-      stock,
-      phone,
-      timestamp: Date.now(),
-      status: 'waiting',
-      revealed: false
-    });
+      const newRequest = {
+        vin,
+        stock,
+        phone,
+        timestamp: Date.now(),
+        status: 'waiting',
+        revealed: false,
+        idUploaded,
+        selfieUploaded,
+        insuranceUploaded
+      };
 
-    fetch("https://api.pushover.net/1/messages.json", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        token: "aupjkhweyqjosrxkqmuoh2gtqgnjjq",
-        user: "u8rd182cirsqwn5bzktt8fpgpenwx2",
-        title: "Test Drive Request",
-        message: `VIN: ${vin}
-Stock: ${stock}
-Phone: ${phone}`,
-        url: "https://drivepath-testdrive.netlify.app/dashboard",
-        url_title: "Open Dashboard"
-      })
-    });
+      // Wait for Firebase push to complete
+      await push(reqRef, newRequest);
 
-    setShowConfirmation(true);
+      // Then send Pushover alert
+      await fetch("https://api.pushover.net/1/messages.json", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          token: "aupjkhweyqjosrxkqmuoh2gtqgnjjq",
+          user: "u8rd182cirsqwn5bzktt8fpgpenwx2",
+          title: "Test Drive Request",
+          message: `VIN: ${vin}\nStock: ${stock}\nPhone: ${phone}`,
+          url: "https://drivepath-testdrive.netlify.app/dashboard",
+          url_title: "Open Dashboard"
+        })
+      });
+
+      // Only show confirmation once both Firebase and alert succeed
+      setShowConfirmation(true);
+
+    } catch (err) {
+      console.error("Error submitting request:", err);
+      alert("Failed to submit request. Please try again.");
+    }
   };
 
   if (showConfirmation) {
