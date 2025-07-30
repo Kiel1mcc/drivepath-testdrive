@@ -65,43 +65,27 @@ export default function Dashboard() {
     <div className="p-4 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center">🚘 Guest Assistance Dashboard</h1>
 
-      {!activeRequest ? (
-        <table className="min-w-full border text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Time</th>
-              <th className="border p-2">Request</th>
-              <th className="border p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(() => {
-              const waitingRequests = requests.filter(r => r.status !== 'complete');
-              if (waitingRequests.length === 0) {
-                return (
-                  <tr>
-                    <td className="border p-4 text-center" colSpan={3}>
-                      No requests yet
-                    </td>
-                  </tr>
-                );
-              }
-              return waitingRequests.map(req => (
-                <tr key={req.id} className="border-t">
-                  <td className="border p-2">{req.timestamp ? new Date(req.timestamp).toLocaleTimeString() : '—'}</td>
-                  <td className="border p-2 font-semibold">Guest Request</td>
-                  <td className="border p-2">
-                    <button onClick={() => handleClaim(req)} className="bg-blue-600 text-white px-4 py-1 rounded">
-                      Claim
-                    </button>
-                  </td>
-                </tr>
-              ));
-            })()}
-          </tbody>
-        </table>
-      ) : (
-        <div className="bg-white p-6 rounded shadow-md border text-left">
+      <div className="space-y-4">
+        {requests.length === 0 ? (
+          <p className="text-center text-gray-500">No requests yet</p>
+        ) : (
+          requests.map((req) => (
+            <div
+              key={req.id}
+              className="border p-4 rounded bg-white shadow cursor-pointer hover:bg-blue-50"
+              onClick={() => handleClaim(req)}
+            >
+              <p><strong>VIN:</strong> {req.vin}</p>
+              <p><strong>Stock:</strong> {req.stock}</p>
+              <p><strong>Phone:</strong> {req.phone}</p>
+              <p><strong>Status:</strong> {req.status}</p>
+            </div>
+          ))
+        )}
+      </div>
+
+      {activeRequest && (
+        <div className="bg-white p-6 rounded shadow-md border text-left mt-4">
           <h2 className="text-xl font-bold mb-4">📝 Guest Request Details</h2>
           <p><strong>Task:</strong> Test Drive</p>
           <p><strong>Location:</strong> Lot</p>
