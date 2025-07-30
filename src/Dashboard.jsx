@@ -64,8 +64,8 @@ function Dashboard() {
           <p><strong>Stock:</strong> {req.stock}</p>
           <p><strong>Phone:</strong> {req.phone}</p>
           <p><strong>Status:</strong> {req.status}</p>
-          <p><strong>[Debug] Raw Status:</strong> "{req.status}"</p>
-          {req.status?.toString().toLowerCase().trim() === 'waiting' && (
+          <p style={{ color: '#999' }}>Status: "{req.status}"</p>
+          {(req.status || '').toLowerCase().trim() === 'waiting' && (
             <button onClick={() => handleClaim(req.id)}>Claim Task</button>
           )}
           {req.status === 'in-progress' && (
