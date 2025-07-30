@@ -1,6 +1,6 @@
 // Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, onValue, update } from 'firebase/database';
+import { getDatabase, ref, onValue, update, get } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import './Dashboard.css';
 
@@ -60,11 +60,20 @@ function Dashboard() {
     setAssistantName('');
   };
 
-  const completeTask = (id) => {
-    const now = new Date().toLocaleTimeString();
-    update(ref(db, `testDriveRequests/${id}`), {
+  const handleCompleteTask = async (taskId) => {
+    const taskRef = ref(db, `testDriveRequests/${taskId}`);
+    const snapshot = await get(taskRef);
+    const data = snapshot.val();
+
+    const startTimestamp = data?.startTime || Date.now();
+    const endTimestamp = Date.now();
+    const durationSeconds = Math.floor((endTimestamp - startTimestamp) / 1000);
+    const durationStr = `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s`;
+
+    await update(taskRef, {
       status: 'complete',
-      completedAt: now
+      completedAt: new Date(endTimestamp).toLocaleTimeString(),
+      duration: durationStr
     });
   };
 
@@ -98,13 +107,34 @@ function Dashboard() {
                 )}
               </td>
               <td>
-                {status === "waiting" ? (
-                  <span
-                    style={{ color: "blue", cursor: "pointer" }}
+                {status === "in-progress" ? (
+                  <button
+                    onClick={() => handleCompleteTask(id)}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#2196F3',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Complete Task
+                  </button>
+                ) : status === "waiting" ? (
+                  <button
                     onClick={() => handleClaim(id)}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#4CAF50',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
                   >
                     Claim
-                  </span>
+                  </button>
                 ) : (
                   "—"
                 )}
