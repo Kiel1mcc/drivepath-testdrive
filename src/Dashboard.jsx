@@ -1,135 +1,103 @@
-// Entry point: Dashboard.jsx
-import React, { useEffect, useState } from 'react';
+// Dashboard.jsx
+import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, onValue, update } from 'firebase/database';
-import app from './firebase';
+import { initializeApp } from 'firebase/app';
+import './Dashboard.css';
 
-export default function Dashboard() {
+const firebaseConfig = {
+  apiKey: 'YOUR_KEY',
+  authDomain: 'YOUR_AUTH_DOMAIN',
+  databaseURL: 'YOUR_DATABASE_URL',
+  projectId: 'YOUR_PROJECT_ID',
+  storageBucket: 'YOUR_BUCKET',
+  messagingSenderId: 'YOUR_MSG_ID',
+  appId: 'YOUR_APP_ID'
+};
+
+initializeApp(firebaseConfig);
+const db = getDatabase();
+
+function Dashboard() {
   const [requests, setRequests] = useState([]);
-  const [activeRequest, setActiveRequest] = useState(null);
-  const [plate, setPlate] = useState('');
-  const [vinPhoto, setVinPhoto] = useState(null);
+  const [claiming, setClaiming] = useState(null);
+  const [assistantName, setAssistantName] = useState('');
 
   useEffect(() => {
-    const db = getDatabase(app);
-    const reqRef = ref(db, 'testDriveRequests');
-
-    const unsub = onValue(reqRef, (snapshot) => {
+    const requestsRef = ref(db, 'testDriveRequests');
+    onValue(requestsRef, (snapshot) => {
       const data = snapshot.val();
-      if (data) {
-        const allRequests = Object.entries(data).map(([key, value]) => ({ id: key, ...value }));
-        setRequests(allRequests.reverse());
-      } else {
-        setRequests([]);
-      }
+      const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
+      parsed.sort((a, b) => b.timestamp - a.timestamp);
+      setRequests(parsed);
     });
-
-    return () => unsub();
   }, []);
 
-  const handleClaim = (request) => {
-    const reqRef = ref(getDatabase(app), `testDriveRequests/${request.id}`);
-    update(reqRef, { status: 'in-progress', revealed: true });
-    setActiveRequest(request);
+  const handleClaim = (id) => {
+    setClaiming(id);
   };
 
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files[0];
-    setVinPhoto(file);
-  };
-
-  const handleComplete = () => {
-    if (!activeRequest) return;
-
-    const endTime = Date.now();
-    const startTime = Number(activeRequest.timestamp);
-    const durationMs = endTime - startTime;
-    const minutes = Math.floor(durationMs / 60000);
-    const seconds = Math.floor((durationMs % 60000) / 1000);
-    const duration = `${minutes}m ${seconds}s`;
-
-    const reqRef = ref(getDatabase(app), `testDriveRequests/${activeRequest.id}`);
-    update(reqRef, {
-      status: 'complete',
-      completedAt: new Date().toLocaleTimeString(),
-      duration,
-      plate,
-      vinPhoto: vinPhoto ? vinPhoto.name : ''
+  const confirmClaim = () => {
+    const now = new Date().toLocaleTimeString();
+    update(ref(db, `testDriveRequests/${claiming}`), {
+      status: 'in-progress',
+      assistant: assistantName,
+      claimedAt: now
     });
+    setClaiming(null);
+    setAssistantName('');
+  };
 
-    setActiveRequest(null);
-    setPlate('');
-    setVinPhoto(null);
+  const completeTask = (id) => {
+    const now = new Date().toLocaleTimeString();
+    update(ref(db, `testDriveRequests/${id}`), {
+      status: 'complete',
+      completedAt: now
+    });
   };
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center">🚘 Guest Assistance Dashboard</h1>
+    <div className="dashboard">
+      <h2>🚗 Guest Assistance Dashboard</h2>
+      {requests.map(req => (
+        <div key={req.id} className={`card ${req.status}`}>
+          <p><strong>VIN:</strong> {req.vin}</p>
+          <p><strong>Stock:</strong> {req.stock}</p>
+          <p><strong>Phone:</strong> {req.phone}</p>
+          {req.status === 'waiting' && (
+            <button onClick={() => handleClaim(req.id)}>Claim Task</button>
+          )}
+          {req.status === 'in-progress' && (
+            <>
+              <p><strong>Assistant:</strong> {req.assistant}</p>
+              <p><strong>Claimed At:</strong> {req.claimedAt}</p>
+              <button onClick={() => completeTask(req.id)}>Complete Task</button>
+            </>
+          )}
+          {req.status === 'complete' && (
+            <>
+              <p><strong>Assistant:</strong> {req.assistant}</p>
+              <p><strong>Completed At:</strong> {req.completedAt}</p>
+            </>
+          )}
+        </div>
+      ))}
 
-      <div className="space-y-4">
-        {requests.length === 0 ? (
-          <p className="text-center text-gray-500">No requests yet</p>
-        ) : (
-          requests.map((req) => (
-            <div
-              key={req.id}
-              className="border p-4 rounded bg-white shadow cursor-pointer hover:bg-blue-50"
-              onClick={() => handleClaim(req)}
-            >
-              <p><strong>VIN:</strong> {req.vin}</p>
-              <p><strong>Stock:</strong> {req.stock}</p>
-              <p><strong>Phone:</strong> {req.phone}</p>
-              <p><strong>Status:</strong> {req.status}</p>
-            </div>
-          ))
-        )}
-      </div>
-
-      {activeRequest && (
-        <div className="bg-white p-6 rounded shadow-md border text-left mt-4">
-          <h2 className="text-xl font-bold mb-4">📝 Guest Request Details</h2>
-          <p><strong>Task:</strong> Test Drive</p>
-          <p><strong>Location:</strong> Lot</p>
-          <p><strong>Year:</strong> {activeRequest.year || '—'}</p>
-          <p><strong>Make:</strong> {activeRequest.make || '—'}</p>
-          <p><strong>Model:</strong> {activeRequest.model || '—'}</p>
-          <p><strong>VIN:</strong> {activeRequest.vin}</p>
-          <p><strong>Stock #:</strong> {activeRequest.stock}</p>
-
-          <div className="mt-4">
-            <label className="block font-medium mb-1">Enter Plate Number:</label>
+      {claiming && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Enter Guest Assistant Name</h3>
             <input
               type="text"
-              className="border px-3 py-1 rounded w-full"
-              value={plate}
-              onChange={(e) => setPlate(e.target.value)}
+              value={assistantName}
+              onChange={e => setAssistantName(e.target.value)}
             />
+            <button onClick={confirmClaim}>Submit</button>
+            <button onClick={() => setClaiming(null)}>Cancel</button>
           </div>
-
-          <div className="mt-4">
-            <label className="block font-medium mb-1">Upload VIN Photo:</label>
-            <input
-              type="file"
-              accept="image/*"
-              className="block"
-              onChange={handlePhotoUpload}
-            />
-          </div>
-
-          <button
-            onClick={handleComplete}
-            className="mt-6 bg-green-600 text-white px-6 py-2 rounded disabled:opacity-50"
-            disabled={!vinPhoto}
-          >
-            ✅ Complete Request
-          </button>
         </div>
       )}
     </div>
   );
 }
 
-// Firebase config in firebase.js
-// import { initializeApp } from 'firebase/app';
-// const firebaseConfig = { ... }; // from Firebase console
-// const app = initializeApp(firebaseConfig);
-// export default app;
+export default Dashboard;
