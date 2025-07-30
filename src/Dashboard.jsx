@@ -44,7 +44,7 @@ function Dashboard() {
     return () => unsubscribe();
   }, []);
 
-  const handleClaim = (id) => {
+  const openClaimDialog = (id) => {
     setClaimingId(id);
   };
 
@@ -107,7 +107,21 @@ function Dashboard() {
                 )}
               </td>
               <td>
-                {status === "in-progress" ? (
+                {status === "waiting" ? (
+                  <button
+                    onClick={() => openClaimDialog(id)}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#4CAF50',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Claim
+                  </button>
+                ) : status === "in-progress" ? (
                   <button
                     onClick={() => handleCompleteTask(id)}
                     style={{
@@ -120,20 +134,6 @@ function Dashboard() {
                     }}
                   >
                     Complete Task
-                  </button>
-                ) : status === "waiting" ? (
-                  <button
-                    onClick={() => handleClaim(id)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#4CAF50',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Claim
                   </button>
                 ) : (
                   "—"
