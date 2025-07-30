@@ -30,8 +30,8 @@ function Dashboard() {
       const data = snapshot.val();
       const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
 
-      // Ensure proper sorting — newest first
-      parsed.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+      // Ensure proper sorting — newest first by startTime if available
+      parsed.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
 
       setRequests(parsed);
     });
