@@ -46,7 +46,7 @@ export default function UploadPage() {
         stock,
         phone,
         timestamp: Date.now(),
-        status: 'waiting',
+        status: "waiting",
         revealed: false,
         idUploaded,
         selfieUploaded,
