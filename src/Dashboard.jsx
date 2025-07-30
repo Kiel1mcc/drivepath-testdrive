@@ -4,14 +4,16 @@ import { getDatabase, ref, onValue, update } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import './Dashboard.css';
 
+// Firebase config copied from src/firebase.js so the dashboard can connect
+// to the same project as the rest of the application.
 const firebaseConfig = {
-  apiKey: 'YOUR_KEY',
-  authDomain: 'YOUR_AUTH_DOMAIN',
-  databaseURL: 'YOUR_DATABASE_URL',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_BUCKET',
-  messagingSenderId: 'YOUR_MSG_ID',
-  appId: 'YOUR_APP_ID'
+  apiKey: "AIzaSyDGZmRRpMsw8MHC2dHnTUfEJkhg6TojSI",
+  authDomain: "drivepath-404fd.firebaseapp.com",
+  projectId: "drivepath-404fd",
+  storageBucket: "drivepath-404fd.appspot.com",
+  messagingSenderId: "426514951629",
+  appId: "1:426514951629:web:69e4d3f94dc1c8a0f096884",
+  databaseURL: "https://drivepath-404fd-default-rtdb.firebaseio.com"
 };
 
 const app = initializeApp(firebaseConfig);
