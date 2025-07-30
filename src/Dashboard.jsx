@@ -14,36 +14,37 @@ const firebaseConfig = {
   appId: 'YOUR_APP_ID'
 };
 
-initializeApp(firebaseConfig);
-const db = getDatabase();
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 function Dashboard() {
   const [requests, setRequests] = useState([]);
-  const [claiming, setClaiming] = useState(null);
+  const [claimingId, setClaimingId] = useState(null);
   const [assistantName, setAssistantName] = useState('');
 
   useEffect(() => {
     const requestsRef = ref(db, 'testDriveRequests');
-    onValue(requestsRef, (snapshot) => {
+    const unsubscribe = onValue(requestsRef, (snapshot) => {
       const data = snapshot.val();
-      const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
-      parsed.sort((a, b) => b.timestamp - a.timestamp);
-      setRequests(parsed);
+      const list = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })) : [];
+      list.sort((a, b) => b.timestamp - a.timestamp);
+      setRequests(list);
     });
+    return () => unsubscribe();
   }, []);
 
-  const handleClaim = (id) => {
-    setClaiming(id);
+  const handleClaimClick = (id) => {
+    setClaimingId(id);
   };
 
   const confirmClaim = () => {
     const now = new Date().toLocaleTimeString();
-    update(ref(db, `testDriveRequests/${claiming}`), {
+    update(ref(db, `testDriveRequests/${claimingId}`), {
       status: 'in-progress',
       assistant: assistantName,
       claimedAt: now
     });
-    setClaiming(null);
+    setClaimingId(null);
     setAssistantName('');
   };
 
@@ -58,16 +59,16 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <h2>🚗 Guest Assistance Dashboard</h2>
-      {requests.map(req => (
+      {requests.map((req) => (
         <div key={req.id} className={`card ${req.status}`}>
           <p><strong>VIN:</strong> {req.vin}</p>
           <p><strong>Stock:</strong> {req.stock}</p>
           <p><strong>Phone:</strong> {req.phone}</p>
-          <p><strong>Status:</strong> {req.status}</p>
-          <p style={{ color: '#999' }}>Status: "{req.status}"</p>
-          {(req.status || '').toLowerCase().trim() === 'waiting' && (
-            <button onClick={() => handleClaim(req.id)}>Claim Task</button>
+
+          {req.status === 'waiting' && (
+            <button onClick={() => handleClaimClick(req.id)}>Claim Task</button>
           )}
+
           {req.status === 'in-progress' && (
             <>
               <p><strong>Assistant:</strong> {req.assistant}</p>
@@ -75,6 +76,7 @@ function Dashboard() {
               <button onClick={() => completeTask(req.id)}>Complete Task</button>
             </>
           )}
+
           {req.status === 'complete' && (
             <>
               <p><strong>Assistant:</strong> {req.assistant}</p>
@@ -84,17 +86,19 @@ function Dashboard() {
         </div>
       ))}
 
-      {claiming && (
+      {claimingId && (
         <div className="modal">
           <div className="modal-content">
             <h3>Enter Guest Assistant Name</h3>
             <input
               type="text"
               value={assistantName}
-              onChange={e => setAssistantName(e.target.value)}
+              onChange={(e) => setAssistantName(e.target.value)}
             />
-            <button onClick={confirmClaim}>Submit</button>
-            <button onClick={() => setClaiming(null)}>Cancel</button>
+            <div style={{ marginTop: '1rem' }}>
+              <button onClick={confirmClaim} disabled={!assistantName}>Submit</button>
+              <button onClick={() => setClaimingId(null)}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
