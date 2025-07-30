@@ -75,17 +75,29 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {requests.filter(r => r.status !== 'complete').map(req => (
-              <tr key={req.id} className="border-t">
-                <td className="border p-2">{req.timestamp ? new Date(req.timestamp).toLocaleTimeString() : '—'}</td>
-                <td className="border p-2 font-semibold">Guest Request</td>
-                <td className="border p-2">
-                  <button onClick={() => handleClaim(req)} className="bg-blue-600 text-white px-4 py-1 rounded">
-                    Claim
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {(() => {
+              const waitingRequests = requests.filter(r => r.status !== 'complete');
+              if (waitingRequests.length === 0) {
+                return (
+                  <tr>
+                    <td className="border p-4 text-center" colSpan={3}>
+                      No requests yet
+                    </td>
+                  </tr>
+                );
+              }
+              return waitingRequests.map(req => (
+                <tr key={req.id} className="border-t">
+                  <td className="border p-2">{req.timestamp ? new Date(req.timestamp).toLocaleTimeString() : '—'}</td>
+                  <td className="border p-2 font-semibold">Guest Request</td>
+                  <td className="border p-2">
+                    <button onClick={() => handleClaim(req)} className="bg-blue-600 text-white px-4 py-1 rounded">
+                      Claim
+                    </button>
+                  </td>
+                </tr>
+              ));
+            })()}
           </tbody>
         </table>
       ) : (
