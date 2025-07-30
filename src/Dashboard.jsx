@@ -93,7 +93,9 @@ function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {requests.map(({ id, startTime, vin, stock, status, duration }) => (
+          {requests.map((task) => {
+            const { id, startTime, vin, stock, status, duration } = task;
+            return (
             <tr key={id}>
               <td>{startTime ? new Date(startTime).toLocaleTimeString() : "--"}</td>
               <td>{vin || "--"}</td>
@@ -141,9 +143,10 @@ function Dashboard() {
                 )}
               </td>
               <td>{duration || "—"}</td>
-              <td>Test Drive</td>
+              <td>{task.assistant ? "Test Drive" : ""}</td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
 
