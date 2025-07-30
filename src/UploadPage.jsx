@@ -41,11 +41,13 @@ export default function UploadPage() {
       const db = getDatabase(app);
       const reqRef = ref(db, 'testDriveRequests');
 
+      const startTime = Date.now();
       const newRequest = {
         vin,
         stock,
         phone,
-        timestamp: Date.now(),
+        timestamp: startTime,
+        startTime,
         status: "waiting",
         revealed: false,
         idUploaded,
