@@ -63,7 +63,8 @@ function Dashboard() {
           <p><strong>VIN:</strong> {req.vin}</p>
           <p><strong>Stock:</strong> {req.stock}</p>
           <p><strong>Phone:</strong> {req.phone}</p>
-          {req.status === 'waiting' && (
+          <p><strong>Status:</strong> {req.status}</p>
+          {req.status?.toLowerCase().trim() === 'waiting' && (
             <button onClick={() => handleClaim(req.id)}>Claim Task</button>
           )}
           {req.status === 'in-progress' && (
