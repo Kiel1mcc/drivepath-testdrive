@@ -67,9 +67,6 @@ Phone: ${phone}`,
     });
 
     setShowConfirmation(true);
-  });
-
-    setShowConfirmation(true);
   };
 
   if (showConfirmation) {
