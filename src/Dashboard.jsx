@@ -117,16 +117,66 @@ function Dashboard() {
 
       {claimingId && (
         <div className="modal">
-          <div className="modal-content">
-            <h3>Enter Guest Assistant Name</h3>
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '10px',
+              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+              width: '300px',
+              textAlign: 'center',
+              margin: 'auto',
+            }}
+          >
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Enter Guest Assistant Name
+            </label>
             <input
               type="text"
               value={assistantName}
               onChange={(e) => setAssistantName(e.target.value)}
+              style={{
+                padding: '8px',
+                width: '100%',
+                marginBottom: '15px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
             />
-            <div style={{ marginTop: '1rem' }}>
-              <button onClick={confirmClaim} disabled={!assistantName}>Submit</button>
-              <button onClick={() => setClaimingId(null)}>Cancel</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button
+                onClick={confirmClaim}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+                disabled={!assistantName}
+              >
+                Submit
+              </button>
+              <button
+                onClick={() => setClaimingId(null)}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#f44336',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
