@@ -28,9 +28,12 @@ function Dashboard() {
     const requestsRef = ref(db, 'testDriveRequests');
     const unsubscribe = onValue(requestsRef, (snapshot) => {
       const data = snapshot.val();
-      const list = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })) : [];
-      list.sort((a, b) => b.timestamp - a.timestamp);
-      setRequests(list);
+      const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
+
+      // Ensure proper sorting — newest first
+      parsed.sort((a, b) => b.timestamp - a.timestamp);
+
+      setRequests(parsed);
     });
     return () => unsubscribe();
   }, []);
