@@ -30,17 +30,21 @@ function Dashboard() {
       const data = snapshot.val();
       const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
 
-      // Only include requests that have a startTime and sort newest first
+      // Sort by startTime (newest first) and ignore missing values
       const ordered = parsed
         .filter((req) => req.startTime)
-        .sort((a, b) => b.startTime - a.startTime);
+        .sort((a, b) => {
+          const aTime = a.startTime || 0;
+          const bTime = b.startTime || 0;
+          return bTime - aTime;
+        });
 
       setRequests(ordered);
     });
     return () => unsubscribe();
   }, []);
 
-  const handleClaimClick = (id) => {
+  const handleClaim = (id) => {
     setClaimingId(id);
   };
 
@@ -67,32 +71,49 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <h2>🚗 Guest Assistance Dashboard</h2>
-      {requests.map((req) => (
-        <div key={req.id} className={`card ${req.status}`}>
-          <p><strong>VIN:</strong> {req.vin}</p>
-          <p><strong>Stock:</strong> {req.stock}</p>
-          <p><strong>Phone:</strong> {req.phone}</p>
-
-          {req.status === 'waiting' && (
-            <button onClick={() => handleClaimClick(req.id)}>Claim Task</button>
-          )}
-
-          {req.status === 'in-progress' && (
-            <>
-              <p><strong>Assistant:</strong> {req.assistant}</p>
-              <p><strong>Claimed At:</strong> {req.claimedAt}</p>
-              <button onClick={() => completeTask(req.id)}>Complete Task</button>
-            </>
-          )}
-
-          {req.status === 'complete' && (
-            <>
-              <p><strong>Assistant:</strong> {req.assistant}</p>
-              <p><strong>Completed At:</strong> {req.completedAt}</p>
-            </>
-          )}
-        </div>
-      ))}
+      <table className="requests-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>VIN</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Claim</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map(({ id, startTime, vin, stock, status, duration }) => (
+            <tr key={id}>
+              <td>{startTime ? new Date(startTime).toLocaleTimeString() : "--"}</td>
+              <td>{vin || "--"}</td>
+              <td>{stock || "--"}</td>
+              <td>
+                {status === "waiting" ? (
+                  <span style={{ color: "#d4a300" }}>🟡 Waiting</span>
+                ) : status === "in-progress" ? (
+                  <span style={{ color: "#007bff" }}>🔄 In Progress</span>
+                ) : (
+                  <span style={{ color: "green" }}>✅ Complete</span>
+                )}
+              </td>
+              <td>
+                {status === "waiting" ? (
+                  <span
+                    style={{ color: "blue", cursor: "pointer" }}
+                    onClick={() => handleClaim(id)}
+                  >
+                    Claim
+                  </span>
+                ) : (
+                  "—"
+                )}
+              </td>
+              <td>{duration || "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       {claimingId && (
         <div className="modal">
