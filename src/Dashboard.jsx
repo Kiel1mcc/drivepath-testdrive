@@ -30,10 +30,12 @@ function Dashboard() {
       const data = snapshot.val();
       const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
 
-      // Ensure proper sorting — newest first by startTime if available
-      parsed.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+      // Only include requests that have a startTime and sort newest first
+      const ordered = parsed
+        .filter((req) => req.startTime)
+        .sort((a, b) => b.startTime - a.startTime);
 
-      setRequests(parsed);
+      setRequests(ordered);
     });
     return () => unsubscribe();
   }, []);
