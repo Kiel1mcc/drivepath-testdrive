@@ -31,7 +31,7 @@ function Dashboard() {
       const parsed = data ? Object.entries(data).map(([id, info]) => ({ id, ...info })) : [];
 
       // Ensure proper sorting — newest first
-      parsed.sort((a, b) => b.timestamp - a.timestamp);
+      parsed.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
 
       setRequests(parsed);
     });
@@ -47,7 +47,8 @@ function Dashboard() {
     update(ref(db, `testDriveRequests/${claimingId}`), {
       status: 'in-progress',
       assistant: assistantName,
-      claimedAt: now
+      claimedAt: now,
+      // Do NOT overwrite the original timestamp
     });
     setClaimingId(null);
     setAssistantName('');
